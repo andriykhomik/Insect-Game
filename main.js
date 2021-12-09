@@ -44,7 +44,7 @@ function createInsect(){
 
         insectEl.classList.add('caught');
 
-        hide(insectEl);
+        hide();
         createInsect();
     })
         const imgEl = document.createElement('img');
@@ -54,6 +54,15 @@ function createInsect(){
     screens[screen].appendChild(insectEl);
 }
 
+function hide(){
+    console.log(this)
+    // insect.remove();
+    score++;
+    scoreEl.innerText = `Score: ${score}`;
+    if (score > 19){
+        messageEl.classList.add('visible');
+    }
+}
 
 function randomizer(value){
     if (value !== 360){
@@ -65,14 +74,7 @@ function randomizer(value){
 }
 
 
-function hide(insect){
-    insect.remove();
-    score++;
-    scoreEl.innerText = `Score: ${score}`;
-    if (score > 19){
-        messageEl.classList.add('visible');
-    }
-}
+
 
 
 function setTime(){
@@ -83,16 +85,11 @@ function setTime(){
         minutes ++;
     }
 
-    if (seconds.toString().length > 1){
-        sec = seconds.toString();
-    } else {
-        sec = '0'+ seconds;
-    }
-    if (minutes.toString().length > 1){
-        min = minutes.toString();
-    } else {
-        min = '0'+ minutes;
-    }
+    if (seconds.toString().length > 1) sec = seconds.toString();
+        else sec = '0'+ seconds;
+
+    if (minutes.toString().length > 1) min = minutes.toString();
+        else  min = '0'+ minutes;
 
     timeEl.innerText = `Time: ${min}:${sec}`;
 }
