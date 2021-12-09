@@ -1,98 +1,84 @@
 const screens = document.querySelectorAll('.screen');
-const insectButtons = document.querySelectorAll('.choose-insect-btn');
-const startBtn = document.querySelector('#start-btn');
+const choose_insect_btn = document.querySelectorAll('.choose-insect-btn');
+const start_btn = document.querySelector('#start-btn');
+const game_container = document.querySelector('#game-container');
 const scoreEl = document.querySelector('#score');
 const timeEl = document.querySelector('#time');
 const messageEl = document.querySelector('#message');
-
-let screen = 0;
-let chosenInsect;
-let score = 0;
 let seconds = 0;
-let minutes = 0;
+let score = 0;
+let selected_insect = {};
 
-startBtn.addEventListener('click', ()=> {
-    screens[screen].classList.add('up');
-    screen++;
+start_btn.addEventListener('click', ()=> {
+    screens[0].classList.add('up');
 })
 
-insectButtons.forEach(insectBtn => {
-    insectBtn.addEventListener('click', (e)=> {
-        screens[screen].classList.add('up');
-        chosenInsect = e.target;
-        screen++;
-        createInsect();
-        setInterval(setTime, 1000);
-        start();
+choose_insect_btn.forEach(btn => {
+    btn.addEventListener('click', ()=> {
+        const img = btn.querySelector('img');
+        const src = img.getAttribute('src');
+        const alt = img.getAttribute('alt');
+        selected_insect = {src, alt};
+        screens[1].classList.add('up');
+        setTimeout(createInsect, 1000);
+        startGame();
     })
 })
 
-const start = ()=> {
-    setInterval(createInsect, 2000);
+function startGame(){
+    setInterval(increaseTime, 1000);
+}
+
+function increaseTime(){
+    let m = Math.floor(seconds / 60);
+    let s = seconds % 60;
+    m = m < 10 ? `0${m}` : m;
+    s = s < 10 ? `0${s}` : s;
+    timeEl.innerHTML = `Time: ${m}:${s}`;
+    seconds++;
 }
 
 function createInsect(){
+    const insect = document.createElement('div');
+    insect.classList.add('insect');
+    const {x, y} = getRandomLocation();
+    insect.style.top = `${x}px`;
+    insect.style.left = `${y}px`;
+    insect.innerHTML = `<img src="${selected_insect.src}"
+                                alt="${selected_insect.alt}" 
+                                style="transform: rotate(${Math.random() * 360}deg)"
+                                />`;
 
-    const insectEl = document.createElement('div');
-    insectEl.classList.add('insect');
+    insect.addEventListener('click', catchInsect);
+    game_container.appendChild(insect);
+}
 
-    insectEl.style.left = randomizer(window.innerWidth) + 'px';
-    insectEl.style.top = randomizer(window.innerHeight) + 'px';
-    insectEl.style.transform = `rotate(${randomizer(360)}deg)`;
+function getRandomLocation(){
+    const width = window.innerWidth;
+    const height = window.innerHeight;
+    const x = Math.random() * (width - 200) + 100;
+    const y = Math.random() * (height - 200) + 100;
+    return {x, y};
+}
 
-    insectEl.addEventListener('click', () => {
+function catchInsect(){
+    increaseScore();
+    this.classList.add('caught');
+    setTimeout(()=> this.remove(), 2000);
+    addInsects();
+}
 
-        insectEl.classList.add('caught');
+function addInsects(){
+    setTimeout(createInsect, 1000);
+    setTimeout(createInsect, 1500);
 
-        hide(insectEl);
-        createInsect();
-    })
-        const imgEl = document.createElement('img');
-        imgEl.src = chosenInsect.src;
-
-    insectEl.appendChild(imgEl);
-    screens[screen].appendChild(insectEl);
 }
 
 
-function randomizer(value){
-    if (value !== 360){
-        return Math.floor(Math.random() * (value - 200) + 100);
-    } else {
-        return Math.floor(Math.random() * value);
-    }
-
-}
-
-
-function hide(insect){
-    insect.remove();
+function increaseScore(){
     score++;
-    scoreEl.innerText = `Score: ${score}`;
     if (score > 19){
         messageEl.classList.add('visible');
     }
-}
-
-
-function setTime(){
-    let sec;
-    let min;seconds++;
-    if (seconds === 60){
-        seconds = 0;
-        minutes ++;
-    }
-
-    if (seconds.toString().length > 1){
-        sec = seconds.toString();
-    } else {
-        sec = '0'+ seconds;
-    }
-    if (minutes.toString().length > 1){
-        min = minutes.toString();
-    } else {
-        min = '0'+ minutes;
-    }
-
-    timeEl.innerText = `Time: ${min}:${sec}`;
+    scoreEl.innerHTML = `${score}`
 }
