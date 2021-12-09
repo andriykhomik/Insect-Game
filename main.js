@@ -3,6 +3,7 @@ const insectButtons = document.querySelectorAll('.choose-insect-btn');
 const startBtn = document.querySelector('#start-btn');
 const scoreEl = document.querySelector('#score');
 const timeEl = document.querySelector('#time');
+const messageEl = document.querySelector('#message');
 
 let screen = 0;
 let chosenInsect;
@@ -20,46 +21,63 @@ insectButtons.forEach(insectBtn => {
         screens[screen].classList.add('up');
         chosenInsect = e.target;
         screen++;
-        createInsect()
-        setTime()
+        createInsect();
+        setInterval(setTime, 1000);
+        start();
     })
 })
 
+const start = ()=> {
+    setInterval(createInsect, 2000);
+}
 
 function createInsect(){
 
-    const imgEl = document.createElement('img');
-    imgEl.src = chosenInsect.src;
     const insectEl = document.createElement('div');
     insectEl.classList.add('insect');
 
     insectEl.style.left = randomizer(window.innerWidth) + 'px';
     insectEl.style.top = randomizer(window.innerHeight) + 'px';
     insectEl.style.transform = `rotate(${randomizer(360)}deg)`;
-    insectEl.appendChild(imgEl);
-    insectEl.addEventListener('click', (e) => hide(e.target));
-    screens[screen].appendChild(insectEl);
-    setTimeout(createInsect, 2000);
 
+    insectEl.addEventListener('click', () => {
+
+        insectEl.classList.add('caught');
+
+        hide(insectEl);
+        createInsect();
+    })
+        const imgEl = document.createElement('img');
+        imgEl.src = chosenInsect.src;
+
+    insectEl.appendChild(imgEl);
+    screens[screen].appendChild(insectEl);
 }
 
 
 function randomizer(value){
-    return Math.floor(Math.random() * value);
+    if (value !== 360){
+        return Math.floor(Math.random() * (value - 200) + 100);
+    } else {
+        return Math.floor(Math.random() * value);
+    }
+
 }
+
 
 function hide(insect){
     insect.remove();
     score++;
     scoreEl.innerText = `Score: ${score}`;
-    // createInsect()
+    if (score > 19){
+        messageEl.classList.add('visible');
+    }
 }
 
-let sec;
-let min;
 
 function setTime(){
-
+    let sec;
+    let min;seconds++;
     if (seconds === 60){
         seconds = 0;
         minutes ++;
@@ -77,7 +95,4 @@ function setTime(){
     }
 
     timeEl.innerText = `Time: ${min}:${sec}`;
-
-    seconds++;
 }
-
